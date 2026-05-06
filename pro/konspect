@@ -1,0 +1,130 @@
+1️⃣ Promise.all()
+🔹 Nima qiladi?
+
+Bir nechta promise’larni bir vaqtda ishga tushiradi va
+👉 hammasi muvaffaqiyatli tugasa — natijalarni array qilib qaytaradi
+👉 bittasi xato bersa — darhol xatoga tushadi (reject)
+
+🔹 Sintaksis:
+Promise.all([promise1, promise2, promise3])
+
+🔹 Misol:
+const p1 = fetch("/users");
+const p2 = fetch("/products");
+const p3 = fetch("/orders");
+
+Promise.all([p1, p2, p3])
+  .then(res => console.log("Hammasi bajarildi"))
+  .catch(err => console.log("Xato bor"));
+
+🔹 Muhim xususiyat
+
+Agar 3 ta promise bo‘lsa va 2 tasi bajarilib, 1 tasi xato bersa:
+
+❌ Hammasi bekor bo‘ladi
+❌ catch ishlaydi
+❌ Qolgan natijalar qaytmaydi
+
+🔹 Qachon ishlatiladi?
+
+Sahifa yuklanayotganda bir nechta API chaqiruv kerak bo‘lsa
+
+Hammasi kerak bo‘lsa (masalan: user + products + settings)
+
+2️⃣ Promise.race()
+🔹 Nima qiladi?
+
+Promise’lar ichidan birinchi tugaganini qaytaradi
+(qaysi biri tezroq resolve yoki reject bo‘lsa)
+
+🔹 Sintaksis:
+Promise.race([promise1, promise2])
+
+🔹 Misol:
+const p1 = new Promise(res => setTimeout(() => res("1-tugatdi"), 3000));
+const p2 = new Promise(res => setTimeout(() => res("2-tugatdi"), 1000));
+
+Promise.race([p1, p2])
+  .then(res => console.log(res));
+
+
+Natija:
+
+2-tugatdi
+
+
+Sababi p2 tezroq tugadi.
+
+🔹 Agar tezroq promise xato bersa?
+
+Unda reject bo‘ladi.
+
+🔹 Qachon ishlatiladi?
+
+Timeout qilishda
+
+Qaysi server tez javob bersa shuni olishda
+
+Internet tekshirishda
+
+🔥 Real timeout misol:
+const fetchData = fetch("/api");
+
+const timeout = new Promise((_, reject) =>
+  setTimeout(() => reject("Timeout bo‘ldi"), 2000)
+);
+
+Promise.race([fetchData, timeout])
+  .then(res => console.log(res))
+  .catch(err => console.log(err));
+
+
+Agar API 2 sekunddan kech javob bersa → Timeout ishlaydi.
+
+3️⃣ Promise.allSettled()
+🔹 Nima qiladi?
+
+Hamma promise’lar tugashini kutadi
+❗ Xato bo‘lsa ham to‘xtamaydi
+
+Natijani array ko‘rinishida qaytaradi:
+
+status: "fulfilled"
+
+status: "rejected"
+
+🔹 Misol:
+const p1 = Promise.resolve("OK");
+const p2 = Promise.reject("Xato");
+
+Promise.allSettled([p1, p2])
+  .then(res => console.log(res));
+
+
+Natija:
+
+[
+  { status: "fulfilled", value: "OK" },
+  { status: "rejected", reason: "Xato" }
+]
+
+🔹 Qachon ishlatiladi?
+
+Hamma natija kerak bo‘lsa
+
+Qaysi biri ishladi, qaysi biri ishlamadi bilish kerak bo‘lsa
+
+Statistik ma'lumot yig‘ishda
+
+🔥 Uchalasi orasidagi farq
+Method	Hamma tugashini kutadimi?	Bittasi xato bersa?	Qachon ishlatiladi
+all	✅ Ha	❌ Darhol to‘xtaydi	Hammasi kerak bo‘lsa
+race	❌ Yo‘q	❌ Birinchi tugagani	Eng tez natija kerak bo‘lsa
+allSettled	✅ Ha	✅ To‘xtamaydi	Hamma natija kerak bo‘lsa
+🎯 Qisqa eslab qolish
+
+all → Hammasi yoki hech narsa
+
+race → Kim tezroq?
+
+allSettled → Hamma natija kerak
